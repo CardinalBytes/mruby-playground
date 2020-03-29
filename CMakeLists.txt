@@ -3,9 +3,8 @@ project(rvm C)
 
 set(CMAKE_C_STANDARD 99)
 
-set(CLANG_LINK_FLAGS "-lm")
-add_executable(rvm main.c)
+add_executable(rvm main.c rvm.c consts.h)
 target_include_directories(rvm PUBLIC vendor/mruby/include/)
 target_link_directories(rvm PUBLIC vendor/mruby/build/host/lib/)
 target_link_libraries(rvm libmruby.a)
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CLANG_LINK_FLAGS}")
+target_link_libraries(rvm m)
