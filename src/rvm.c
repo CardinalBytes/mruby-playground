@@ -1,13 +1,15 @@
 #include "rvm.h"
 #include "consts.h"
 
-int open_binary(const char *path, uint8_t *block) {
+uint8_t *open_binary(const char *path, uint8_t *block) {
   FILE *fp = fopen(path, "r");
   if (!fp) {
-    return -1;
+    return 0;
   }
-  if (rvm_ingest_bytes(block, MAX_BUFFER, fp));
-
+  if (!rvm_ingest_bytes(block, MAX_BUFFER, fp)) {
+    return 0;
+  }
+  return rvm_bytes_to_program(block);
 }
 
 uint64_t rvm_ingest_bytes(uint8_t *block, uint64_t to_ingest, FILE *from) {
