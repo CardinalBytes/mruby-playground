@@ -11,7 +11,6 @@
 /**
  * This is given in bytes, if the binary to load is larger than this the program will throw an error
  * */
-#define MAX_BUFFER 4096
 
 int main(int argc, char **argv) {
   uint16_t fn_size = 255;
@@ -55,10 +54,11 @@ int main(int argc, char **argv) {
       return -1;
     }
 
-    struct mrb_parser_state *parser;
+    const char *std_path = getenv("RVMSTD_PATH");
 
     mrb_load_irep(mrb, program);
     mrb_close(mrb);
+    free(program);
   }
   return 0;
 }

@@ -1,13 +1,22 @@
 #include "rvm.h"
 #include "consts.h"
 
+int open_binary(const char *path, uint8_t *block) {
+  FILE *fp = fopen(path, "r");
+  if (!fp) {
+    return -1;
+  }
+  if (rvm_ingest_bytes(block, MAX_BUFFER, fp));
+
+}
+
 uint64_t rvm_ingest_bytes(uint8_t *block, uint64_t to_ingest, FILE *from) {
   size_t read = fread(block, sizeof(uint8_t), to_ingest, from);
   return read;
 }
 
 /**
- * This function validates a program contained in the block param and strips any extra bytes at the end
+ * This function validates a program contained in the block param and makes it so a program uses only the needed memory
  * @param block
  * @return 1 if the parsing was successful 0 otherwise
  */
@@ -61,4 +70,9 @@ endianess_t rvm_det_endianess() {
 
   det.i = 0x01020304;
   return (det.buff[0] == 0x01) ? BigEndian : LittleEndian;
+}
+
+int load_std_lib(mrb_state *mrb, const char *std_path) {
+  mrb_define_const(mrb, mrb->kernel_module, "STD_PATH", mrb_str_new_cstr(mrb, (std_path != NULL) ? std_path : "std"));
+
 }

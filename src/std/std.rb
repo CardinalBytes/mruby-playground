@@ -1,8 +1,8 @@
 # This leverages ruby to wrap calls to inner functions to load a module
 
-# def require(mod_name)
-#     pass
-# end
+def require(mod_name)
+    internals_load "#{STD_PATH}/#{mod_name}"
+end
 
 # this acts mostly like the require_relative from regular ruby
 def require_relative(fname)
