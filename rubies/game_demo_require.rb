@@ -1,8 +1,4 @@
-def cim(lm, rm)
-  lm = lm.upcase
-  rm = rm.upcase
-  return lm == rm
-end
+require_relative "core_defs"
 
 def get_guess()
   puts "your guess:"
