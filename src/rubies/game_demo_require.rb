@@ -1,4 +1,4 @@
-require_relative "core_defs"
+require_relative "common"
 
 def get_guess()
   puts "your guess:"
@@ -7,9 +7,9 @@ def get_guess()
 end
 
 while true
-  n = rand 50
+  n = prand 50
   if n == 0
-    n = rand 50
+    n = prand 50
   end
   puts "guess the number between 0 and 50, type giveup to roll again, or quit/exit"
   tries = 0

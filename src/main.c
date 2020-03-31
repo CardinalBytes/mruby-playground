@@ -1,12 +1,9 @@
 #include <jemalloc/jemalloc.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
 #include <inttypes.h>
 #include "rvm.h"
 #include <mruby.h>
 #include <mruby/irep.h>
+#include <libgen.h>
 
 /**
  * This is given in bytes, if the binary to load is larger than this the program will throw an error
@@ -24,41 +21,23 @@ int main(int argc, char **argv) {
       }
     }
     filename = argv[1];
-    FILE *fp = fopen(filename, "r");
-    if (!fp) {
-      printf("File: %s, does not exist\n", filename);
+    uint8_t *block = (uint8_t *) malloc(MAX_BUFFER);
+    if (!block) {
       return -1;
     }
 
-    uint8_t *byte_buff = (uint8_t *) malloc(sizeof(uint8_t) * MAX_BUFFER);
-    if (!byte_buff) {
-      return -1;
-    }
-
-    uint64_t ingested = rvm_ingest_bytes(byte_buff, MAX_BUFFER, fp);
-    if (ingested == 0) {
-      return -1;
-    }
-
-    uint8_t *program = rvm_bytes_to_program(byte_buff);
-    if (!program) {
-      printf("invalid irep\n");
-      return -1;
-    }
-
-    free((void *) byte_buff);
+    uint8_t *pbinary = rvm_load_binary(filename, block);
 
     mrb_state *mrb = mrb_open();
     if (!mrb) {
-      printf("Failed to initialize mruby\n");
       return -1;
     }
 
-    const char *std_path = getenv("RVMSTD_PATH");
-
-    mrb_load_irep(mrb, program);
+    rvm_lstl(mrb, NULL, dirname(filename));
+    mrb_load_irep(mrb, pbinary);
+    mrb_print_error(mrb);
     mrb_close(mrb);
-    free(program);
+    free(block);
   }
   return 0;
 }
