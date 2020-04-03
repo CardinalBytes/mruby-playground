@@ -5,10 +5,6 @@
 #include <mruby/irep.h>
 #include <libgen.h>
 
-/**
- * This is given in bytes, if the binary to load is larger than this the program will throw an error
- * */
-
 int main(int argc, char **argv) {
   uint16_t fn_size = 255;
   char *filename = (char *) malloc(sizeof(char) * fn_size);
