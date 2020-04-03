@@ -1,4 +1,4 @@
-#include "rvm.h"
+#include "include/rvm.h"
 #include "consts.h"
 
 uint8_t *rvm_load_binary(const char *path, uint8_t *block) {

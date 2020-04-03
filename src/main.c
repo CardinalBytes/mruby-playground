@@ -1,6 +1,6 @@
 #include <jemalloc/jemalloc.h>
 #include <inttypes.h>
-#include "rvm.h"
+#include "include/rvm.h"
 #include <mruby.h>
 #include <mruby/irep.h>
 #include <libgen.h>
