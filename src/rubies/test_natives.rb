@@ -1,4 +1,4 @@
-puts "STD_PATH is #{STD_PATH} and CR_BPATH #{CR_BPAT}"
+puts "STD_PATH is #{STD_PATH} and CR_BPATH #{CR_BPAT}, PI: #{Math::PI}, #{Math::E}"
 INative.cout "test of importing\n"
 
 def require_relative(fname)
@@ -17,4 +17,15 @@ def require_relative(fname)
   end
 end
 
-require_relative "game_demo_require"
+# require_relative "game_demo_require"
+begin
+  require_relative "trig"
+rescue StandardError
+  puts "import failed"
+end
+
+p = Point2D.new 0.0, 0.0
+for i in 0..359
+	Trig.trans_point(p, 1, Trig.soft_dtor(i))
+	puts "#{p} at #{i}"
+end

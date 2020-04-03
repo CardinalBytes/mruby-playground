@@ -8,9 +8,10 @@
 #include <mruby.h>
 #include <mruby/compile.h>
 #include <mruby/string.h>
+#include <mruby/data.h>
 #include <mruby/irep.h>
 
-#define MAX_BUFFER 4096
+#define MAX_BUFFER 4096 * 1000
 
 typedef enum { BigEndian, LittleEndian } endianess_t;
 

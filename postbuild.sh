@@ -17,3 +17,6 @@ for item in "$build_dir"/*.rb; do
     "$compiler" "$item"
     rm "$item"
 done
+
+echo "take snapshot"
+tar czf "rvm-snapshot-$(date --utc --iso-8601=date).tgz" build

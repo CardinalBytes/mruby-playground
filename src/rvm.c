@@ -1,5 +1,6 @@
 #include "include/rvm.h"
 #include "consts.h"
+#include <math.h>
 
 uint8_t *rvm_load_binary(const char *path, uint8_t *block) {
   FILE *fp = fopen(path, "r");
@@ -23,7 +24,7 @@ uint64_t rvm_ingest_bytes(uint8_t *block, uint64_t to_ingest, FILE *from) {
  * @return 1 if the parsing was successful 0 otherwise
  */
 uint8_t *rvm_bytes_to_program(uint8_t *block) {
-  /**
+  /*
    * the following code validates the signature
    */
   uint8_t file_sig[8] = {0, 0, 0, 0,
@@ -113,10 +114,35 @@ mrb_value rvm_loadb(mrb_state *mrb, mrb_value self) {
   return mrb_bool_value(res);
 }
 
+mrb_value rvm_degtorad(mrb_state *mrb, mrb_value self) {
+  mrb_float arg = (double_t)0.0;
+  mrb_float ret;
+
+  mrb_get_args(mrb, "f", &arg);
+  ret = arg * M_PI / 180.00;
+  return mrb_float_value(mrb, ret);
+}
+
+mrb_value rvm_radtodeg(mrb_state *mrb, mrb_value self) {
+  mrb_float arg = (double_t)0.0;
+  mrb_float ret;
+
+  mrb_get_args(mrb, "f", &arg);
+  ret = arg * 180.00 / M_PI;
+  return mrb_float_value(mrb, ret);
+}
+
 int rvm_lstl(mrb_state *mrb, const char *std_path, const char *cr_bpat) {
+  mrb_float pi = M_PI;
+  mrb_float ec = M_E;
   mrb_define_const(mrb, mrb->kernel_module, "STD_PATH", mrb_str_new_cstr(mrb, (std_path != NULL) ? std_path : "std"));
   mrb_define_const(mrb, mrb->kernel_module, "CR_BPAT", mrb_str_new_cstr(mrb, cr_bpat));
+  struct RClass *_class_nmaths = mrb_define_module(mrb, "Math");
   struct RClass *_class_native = mrb_define_module(mrb, "INative");
+  mrb_define_const(mrb, _class_nmaths, "PI", mrb_float_value(mrb, pi));
+  mrb_define_const(mrb, _class_nmaths, "E", mrb_float_value(mrb, ec));
+  mrb_define_class_method(mrb, _class_nmaths, "dtor", rvm_degtorad, MRB_ARGS_REQ(1));
+  mrb_define_class_method(mrb, _class_nmaths, "rtod", rvm_radtodeg, MRB_ARGS_REQ(1));
   mrb_define_class_method(mrb, _class_native, "load", rvm_loadb, MRB_ARGS_REQ(1));
   mrb_define_class_method(mrb, _class_native, "cout", rvm_cout, MRB_ARGS_REQ(1));
   return 0;

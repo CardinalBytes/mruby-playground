@@ -31,7 +31,9 @@ int main(int argc, char **argv) {
 
     rvm_lstl(mrb, NULL, dirname(filename));
     mrb_load_irep(mrb, pbinary);
-    mrb_print_error(mrb);
+    if (mrb->exc) {
+	  mrb_print_error(mrb);
+	}
     mrb_close(mrb);
     free(block);
   }
