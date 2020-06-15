@@ -8,12 +8,12 @@ end
 def require_relative(fname)
   if File.extname(fname) == ""
     if File.exist?("#{CR_BPAT}/#{fname}.mrb")
-      if not INative.load("#{CR_BPAT}/#{fname}.mrb")
+      if not Internals.load("#{CR_BPAT}/#{fname}.mrb")
         raise StandardError.new "Problem in native function"
       end
     end
   elsif File.extname(fname) == ".mrb" and File.exist?(fname)
-    if not INative.load("#{CR_BPAT}/#{fname}")
+    if not Internals.load("#{CR_BPAT}/#{fname}")
       raise StandardError.new "Problem in native function"
     end
   else
