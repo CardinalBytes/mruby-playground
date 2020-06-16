@@ -1,21 +1,23 @@
 # This leverages ruby to wrap calls to inner functions to load a module
 
 def require(mod_name)
-    rvm_load "#{STD_PATH}/#{mod_name}"
+  if File.extname(fname) == ""
+    Internals.CLoader("#{STD_PATH}/#{mod_name}.mrb")
+  else
+    Internals.CLoader("#{STD_PATH}/#{mod_name}")
+  end
 end
 
 # this acts mostly like the require_relative from regular ruby
 def require_relative(fname)
   if File.extname(fname) == ""
     if File.exist?("#{CR_BPAT}/#{fname}.mrb")
-      if not Internals.load("#{CR_BPAT}/#{fname}.mrb")
-        raise StandardError.new "Problem in native function"
-      end
+      Internals.CLoader("#{CR_BPAT}/#{fname}.mrb")
+    elsif File.exist?("#{CR_BPAT}/#{fname}.rb")
+      Internals.CLoader("#{CR_BPAT}/#{fname}.rb")
     end
-  elsif File.extname(fname) == ".mrb" and File.exist?(fname)
-    if not Internals.load("#{CR_BPAT}/#{fname}")
-      raise StandardError.new "Problem in native function"
-    end
+  elsif File.extname(fname) != "" and File.exist?(fname)
+    Internals.CLoader("#{CR_BPAT}/#{fname}")
   else
     raise StandardError.new "file #{fname}.mrb not found"
   end

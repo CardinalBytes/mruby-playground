@@ -1,6 +1,6 @@
 #include <malloc.h>
 #include <inttypes.h>
-#include "include/rvm.h"
+#include "include/mruby_sink.h"
 #include <mruby.h>
 #include <mruby/irep.h>
 #include <libgen.h>
@@ -24,8 +24,8 @@ int main(int argc, char **argv) {
 		}
 
 		rvm_lstl(mrb, NULL, dirname(filename));
-		mrbi_ld_file(mrb, filename);
 		mrbi_ld_file(mrb, "core.rb");
+		mrbi_ld_file(mrb, filename);
 		if (mrb->exc) {
 			mrb_print_error(mrb);
 		}

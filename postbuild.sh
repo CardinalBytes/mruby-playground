@@ -18,5 +18,8 @@ for item in "$build_dir"/*.rb; do
     rm "$item"
 done
 
-echo "take snapshot"
-tar czf "rvm-snapshot-$(date --utc --iso-8601=date).tgz" build
+echo "copy std core"
+cp "src/std/core.rb" "build/core.rb"
+
+#echo "take snapshot"
+#tar czf "rvm-snapshot-$(date --utc --iso-8601=date).tgz" build

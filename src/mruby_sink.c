@@ -1,4 +1,4 @@
-#include "include/rvm.h"
+#include "include/mruby_sink.h"
 #include "consts.h"
 #include <unistd.h>
 #include <math.h>
@@ -114,17 +114,12 @@ mrb_value mrbi_radtodeg(mrb_state *mrb, mrb_value self)
 
 mrb_value mrbi_load(mrb_state *mrb, mrb_value self)
 {
-	mrb_value fn = mrb_nil_value();
 	FILE *fp;
-	size_t len;
+	mrb_int len;
 	char *err_msg[255];
 	char *fn_cstr;
-	char *code_buff = 0;
-	struct RClass *_class_internals = mrb_define_module(mrb, "Internals");
 
-	mrb_get_args(mrb, "S", &fn);
-	len = RSTRING_LEN(fn);
-	fn_cstr = malloc(len);
+	mrb_get_args(mrb, "s", &fn_cstr, &len);
 	if (!fn_cstr) {
 		snprintf((char *)err_msg, 255, "Memory allocation fault");
 		goto load_fault;
@@ -138,38 +133,20 @@ mrb_value mrbi_load(mrb_state *mrb, mrb_value self)
 		goto load_fault;
 	}
 
-	fp = fopen(fn_cstr, "rb");
-	if (!fp) {
-		snprintf((char *)err_msg, 255, "Failed to open file %s", fn_cstr);
-		goto load_fault;
-	}
-	if (!ftb(fp, &code_buff)) {
-		snprintf((char *)err_msg, 255, "Memory allocation fault");
-		goto load_fault;
-	}
-
-	/*
-	 * Determining if the file is compiled bytecode or plain text
-	 * by the signature */
-	if (assert_fsig(code_buff) == 0)
-		mrbi_ld_bin(mrb, code_buff);
-	else
-		mrbi_ld_src(mrb, code_buff);
+	mrbi_ld_file(mrb, fn_cstr);
 
 	return mrb_bool_value(1);
 
     load_fault:
 	free((void *)fn_cstr);
-	free(code_buff);
-	mrb_raise(mrb, _class_internals, (const char *)err_msg);
+	mrb_raise(mrb, mrb->module_class, (const char *)err_msg);
 }
 
 int rvm_lstl(mrb_state *mrb, const char *std_path, const char *cr_bpat)
 {
 	mrb_float pi = M_PI;
 	mrb_float ec = M_E;
-	mrb_define_const(mrb, mrb->kernel_module, "STD_PATH", mrb_str_new_cstr(mrb, (std_path != NULL) ? std_path
-												       : "std"));
+	mrb_define_const(mrb, mrb->kernel_module, "STD_PATH", mrb_str_new_cstr(mrb, (std_path != NULL) ? std_path: "std"));
 	mrb_define_const(mrb, mrb->kernel_module, "CR_BPAT", mrb_str_new_cstr(mrb, cr_bpat));
 	struct RClass *_class_nmaths = mrb_define_module(mrb, "Math");
 	struct RClass *_class_internals = mrb_define_module(mrb, "Internals");
@@ -177,7 +154,7 @@ int rvm_lstl(mrb_state *mrb, const char *std_path, const char *cr_bpat)
 	mrb_define_const(mrb, _class_nmaths, "E", mrb_float_value(mrb, ec));
 	mrb_define_class_method(mrb, _class_nmaths, "dtor", mrbi_degtorad, MRB_ARGS_REQ(1));
 	mrb_define_class_method(mrb, _class_nmaths, "rtod", mrbi_radtodeg, MRB_ARGS_REQ(1));
-	mrb_define_class_method(mrb, _class_internals, "load", mrbi_load, MRB_ARGS_REQ(1));
+	mrb_define_class_method(mrb, _class_internals, "CLoader", mrbi_load, MRB_ARGS_REQ(1));
 	mrb_define_class_method(mrb, _class_internals, "cout", mrbi_cout, MRB_ARGS_REQ(1));
 	return 0;
 }
